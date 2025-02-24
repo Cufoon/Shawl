@@ -196,11 +196,11 @@ speculate::speculate! {
         it "handles --name with spaces" {
             assert_eq!(
                 construct_shawl_run_args(
-                    &s("C:/Program Files/shawl"),
+                    &s("C:/abcdef_test/Program Files/shawl"),
                     &get_current_directory().unwrap(),
                     &CommonOpts::default()
                 ),
-                vec!["run", "--name", "\"C:/Program Files/shawl\""],
+                vec!["run", "--name", "\"C:/abcdef_test/Program Files/shawl\""],
             );
         }
 
@@ -351,7 +351,7 @@ speculate::speculate! {
                     &s("C:/abcdef_test/foo"),
                     &CommonOpts::default()
                 ),
-                vec!["run", "--name", "shawl", "--cwd", "C:/foo"],
+                vec!["run", "--name", "shawl", "--cwd", "C:/abcdef_test/foo"],
             );
         }
 
@@ -362,7 +362,7 @@ speculate::speculate! {
                     &s("C:/abcdef_test/Program Files/foo"),
                     &CommonOpts::default()
                 ),
-                vec!["run", "--name", "shawl", "--cwd", "\"C:/Program Files/foo\""],
+                vec!["run", "--name", "shawl", "--cwd", "\"C:/abcdef_test/Program Files/foo\""],
             );
         }
 
@@ -427,11 +427,11 @@ speculate::speculate! {
                     &s("shawl"),
                     &get_current_directory().unwrap(),
                     &CommonOpts {
-                        log_dir: Some("C:/foo".to_string()),
+                        log_dir: Some("C:/abcdef_test/foo".to_string()),
                         ..Default::default()
                     }
                 ),
-                vec!["run", "--name", "shawl", "--log-dir", "C:/foo"],
+                vec!["run", "--name", "shawl", "--log-dir", "C:/abcdef_test/foo"],
             );
         }
 
@@ -441,11 +441,11 @@ speculate::speculate! {
                     &s("shawl"),
                     &get_current_directory().unwrap(),
                     &CommonOpts {
-                        log_dir: Some("C:/foo bar/hello".to_string()),
+                        log_dir: Some("C:/abcdef_test/foo bar/hello".to_string()),
                         ..Default::default()
                     }
                 ),
-                vec!["run", "--name", "shawl", "--log-dir", "\"C:/foo bar/hello\""],
+                vec!["run", "--name", "shawl", "--log-dir", "\"C:/abcdef_test/foo bar/hello\""],
             );
         }
 
@@ -539,11 +539,11 @@ speculate::speculate! {
                     &s("shawl"),
                     &get_current_directory().unwrap(),
                     &CommonOpts {
-                        path: vec![s("C:/foo")],
+                        path: vec![s("C:/abcdef_test/foo")],
                         ..Default::default()
                     }
                 ),
-                vec!["run", "--name", "shawl", "--path", "C:/foo"],
+                vec!["run", "--name", "shawl", "--path", "C:/abcdef_test/foo"],
             );
         }
 
@@ -553,11 +553,11 @@ speculate::speculate! {
                     &s("shawl"),
                     &get_current_directory().unwrap(),
                     &CommonOpts {
-                        path: vec![s("C:/foo bar")],
+                        path: vec![s("C:/abcdef_test/foo bar")],
                         ..Default::default()
                     }
                 ),
-                vec!["run", "--name", "shawl", "--path", "\"C:/foo bar\""],
+                vec!["run", "--name", "shawl", "--path", "\"C:/abcdef_test/foo bar\""],
             );
         }
 
@@ -567,11 +567,11 @@ speculate::speculate! {
                     &s("shawl"),
                     &get_current_directory().unwrap(),
                     &CommonOpts {
-                        path: vec![s("C:/foo"), s("C:/bar")],
+                        path: vec![s("C:/abcdef_test/foo"), s("C:/abcdef_test/bar")],
                         ..Default::default()
                     }
                 ),
-                vec!["run", "--name", "shawl", "--path", "C:/foo", "--path", "C:/bar"],
+                vec!["run", "--name", "shawl", "--path", "C:/abcdef_test/foo", "--path", "C:/abcdef_test/bar"],
             );
         }
 
