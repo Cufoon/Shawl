@@ -294,7 +294,7 @@ pub enum Subcommand {
         /// Working directory in which to run the command. You may provide a
         /// relative path, and it will be converted to an absolute one
         #[clap(long, value_name = "path", value_parser = parse_canonical_path)]
-        cwd: Option<String>,
+        cwd: String,
 
         /// Other services that must be started first (comma-separated)
         #[clap(long, value_delimiter = ',')]
@@ -311,7 +311,7 @@ pub enum Subcommand {
 
         /// Working directory in which to run the command. Must be an absolute path
         #[clap(long, value_name = "path")]
-        cwd: Option<String>,
+        cwd: String,
 
         /// Name of the service; used in logging, but does not need to match real name
         #[clap(long, default_value = "Shawl")]
@@ -336,6 +336,13 @@ pub struct Cli {
 
 #[cfg(test)]
 speculate::speculate! {
+    fn get_current_directory() -> std::io::Result<String> {
+        match std::env::current_dir() {
+            Ok(path) => Ok(path.display().to_string()),
+            Err(e) => Err(e),
+        }
+    }
+
     fn check_args(args: &[&str], expected: Cli) {
         assert_eq!(
             expected,
@@ -364,7 +371,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             command: vec![s("foo")],
                             ..Default::default()
@@ -387,7 +394,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             pass: Some(vec![1, 2]),
                             command: vec![s("foo")],
@@ -404,7 +411,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             pass: Some(vec![-1]),
                             command: vec![s("foo")],
@@ -428,7 +435,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             restart: true,
                             command: vec![s("foo")],
@@ -458,7 +465,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             no_restart: true,
                             command: vec![s("foo")],
@@ -488,7 +495,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             restart_if: vec![1, 2],
                             command: vec![s("foo")],
@@ -505,7 +512,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             restart_if: vec![-1],
                             command: vec![s("foo")],
@@ -542,7 +549,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             restart_if_not: vec![1, 2],
                             command: vec![s("foo")],
@@ -559,7 +566,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             restart_if_not: vec![-1],
                             command: vec![s("foo")],
@@ -596,7 +603,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             restart_delay: Some(1500),
                             command: vec![s("foo")],
@@ -613,7 +620,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             stop_timeout: Some(500),
                             command: vec![s("foo")],
@@ -630,7 +637,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("custom-name"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             command: vec![s("foo")],
                             ..Default::default()
@@ -648,7 +655,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Add {
                         name: s("custom-name"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         dependencies: vec![],
                         common: CommonOpts {
                             command: vec![s("foo")],
@@ -679,7 +686,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Add {
                         name: s("foo"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         dependencies: vec![],
                         common: CommonOpts {
                             pass: Some(vec![1, 2]),
@@ -697,7 +704,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Add {
                         name: s("foo"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         dependencies: vec![],
                         common: CommonOpts {
                             restart: true,
@@ -715,7 +722,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Add {
                         name: s("foo"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         dependencies: vec![],
                         common: CommonOpts {
                             no_restart: true,
@@ -733,7 +740,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Add {
                         name: s("foo"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         dependencies: vec![],
                         common: CommonOpts {
                             restart_if: vec![1, 2],
@@ -751,7 +758,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Add {
                         name: s("foo"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         dependencies: vec![],
                         common: CommonOpts {
                             restart_if_not: vec![1, 2],
@@ -769,7 +776,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Add {
                         name: s("foo"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         dependencies: vec![],
                         common: CommonOpts {
                             stop_timeout: Some(500),
@@ -787,7 +794,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             no_log: true,
                             command: vec![s("foo")],
@@ -804,7 +811,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             no_log_cmd: true,
                             command: vec![s("foo")],
@@ -821,7 +828,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             log_as: Some("foo".to_string()),
                             command: vec![s("foo")],
@@ -838,7 +845,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             log_cmd_as: Some("foo".to_string()),
                             command: vec![s("foo")],
@@ -855,7 +862,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             log_rotate: Some(LogRotation::Bytes(123)),
                             command: vec![s("foo")],
@@ -872,7 +879,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             log_rotate: Some(LogRotation::Daily),
                             command: vec![s("foo")],
@@ -889,7 +896,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             log_rotate: Some(LogRotation::Hourly),
                             command: vec![s("foo")],
@@ -906,7 +913,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             log_retain: Some(5),
                             command: vec![s("foo")],
@@ -924,7 +931,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             log_dir: Some(p(path)),
                             command: vec![s("foo")],
@@ -941,7 +948,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Run {
                         name: s("Shawl"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         common: CommonOpts {
                             pass_start_args: true,
                             command: vec![s("foo")],
@@ -958,7 +965,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Add {
                         name: s("foo"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         dependencies: vec![],
                         common: CommonOpts {
                             env: vec![(s("FOO"), s("bar"))],
@@ -976,7 +983,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Add {
                         name: s("foo"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         dependencies: vec![],
                         common: CommonOpts {
                             env: vec![(s("FOO"), s("1")), (s("BAR"), s("2"))],
@@ -995,7 +1002,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Add {
                         name: s("foo"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         dependencies: vec![],
                         common: CommonOpts {
                             path: vec![p(path)],
@@ -1015,7 +1022,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Add {
                         name: s("foo"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         dependencies: vec![],
                         common: CommonOpts {
                             path: vec![p(&path1), p(&path2)],
@@ -1034,7 +1041,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Add {
                         name: s("foo"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         dependencies: vec![],
                         common: CommonOpts {
                             path_prepend: vec![p(path)],
@@ -1054,7 +1061,7 @@ speculate::speculate! {
                 Cli {
                     sub: Subcommand::Add {
                         name: s("foo"),
-                        cwd: None,
+                        cwd: get_current_directory().unwrap(),
                         dependencies: vec![],
                         common: CommonOpts {
                             path_prepend: vec![p(&path1), p(&path2)],

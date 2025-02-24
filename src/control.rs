@@ -2,7 +2,7 @@ use crate::cli::CommonOpts;
 use log::error;
 use std::io::Write;
 
-pub fn add_service(name: String, cwd: Option<String>, dependencies: &[String], opts: CommonOpts) -> Result<(), ()> {
+pub fn add_service(name: String, cwd: String, dependencies: &[String], opts: CommonOpts) -> Result<(), ()> {
     let shawl_path = quote(
         &std::env::current_exe()
             .expect("Unable to determine Shawl location")
@@ -46,7 +46,7 @@ pub fn add_service(name: String, cwd: Option<String>, dependencies: &[String], o
     }
 }
 
-fn construct_shawl_run_args(name: &str, cwd: &Option<String>, opts: &CommonOpts) -> Vec<String> {
+fn construct_shawl_run_args(name: &str, cwd: &String, opts: &CommonOpts) -> Vec<String> {
     let mut shawl_args = vec!["run".to_string(), "--name".to_string(), quote(name)];
     if let Some(delay) = opts.restart_delay {
         shawl_args.push("--restart-delay".to_string());
@@ -86,10 +86,8 @@ fn construct_shawl_run_args(name: &str, cwd: &Option<String>, opts: &CommonOpts)
         shawl_args.push("--pass".to_string());
         shawl_args.push(pass.iter().map(|x| x.to_string()).collect::<Vec<String>>().join(","));
     }
-    if let Some(cwd) = &cwd {
-        shawl_args.push("--cwd".to_string());
-        shawl_args.push(quote(cwd));
-    };
+    shawl_args.push("--cwd".to_string());
+    shawl_args.push(quote(cwd));
     if opts.no_log {
         shawl_args.push("--no-log".to_string());
     }
@@ -158,6 +156,13 @@ fn quote(text: &str) -> String {
 
 #[cfg(test)]
 speculate::speculate! {
+    fn get_current_directory() -> std::io::Result<String> {
+        match std::env::current_dir() {
+            Ok(path) => Ok(path.display().to_string()),
+            Err(e) => Err(e),
+        }
+    }
+
     fn s(text: &str) -> String {
         text.to_string()
     }
@@ -167,7 +172,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts::default()
                 ),
                 vec!["run", "--name", "shawl"],
@@ -178,7 +183,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         command: vec![s("foo")],
                         ..Default::default()
@@ -192,7 +197,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("C:/Program Files/shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts::default()
                 ),
                 vec!["run", "--name", "\"C:/Program Files/shawl\""],
@@ -203,7 +208,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         restart: true,
                         ..Default::default()
@@ -217,7 +222,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         no_restart: true,
                         ..Default::default()
@@ -231,7 +236,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         restart_if: vec![0],
                         ..Default::default()
@@ -245,7 +250,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         restart_if: vec![1, 10],
                         ..Default::default()
@@ -259,7 +264,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         restart_if_not: vec![0],
                         ..Default::default()
@@ -273,7 +278,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         restart_if_not: vec![1, 10],
                         ..Default::default()
@@ -287,7 +292,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         pass: Some(vec![0]),
                         ..Default::default()
@@ -301,7 +306,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         pass: Some(vec![1, 10]),
                         ..Default::default()
@@ -315,7 +320,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         restart_delay: Some(1500),
                         ..Default::default()
@@ -329,7 +334,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         stop_timeout: Some(3000),
                         ..Default::default()
@@ -343,7 +348,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &Some(s("C:/foo")),
+                    &s("C:/abcdef_test/foo"),
                     &CommonOpts::default()
                 ),
                 vec!["run", "--name", "shawl", "--cwd", "C:/foo"],
@@ -354,7 +359,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &Some(s("C:/Program Files/foo")),
+                    &s("C:/abcdef_test/Program Files/foo"),
                     &CommonOpts::default()
                 ),
                 vec!["run", "--name", "shawl", "--cwd", "\"C:/Program Files/foo\""],
@@ -365,7 +370,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         no_log: true,
                         ..Default::default()
@@ -378,7 +383,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         no_log_cmd: true,
                         ..Default::default()
@@ -392,7 +397,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         log_as: Some("foo".to_string()),
                         ..Default::default()
@@ -406,7 +411,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         log_cmd_as: Some("foo".to_string()),
                         ..Default::default()
@@ -420,7 +425,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         log_dir: Some("C:/foo".to_string()),
                         ..Default::default()
@@ -434,7 +439,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         log_dir: Some("C:/foo bar/hello".to_string()),
                         ..Default::default()
@@ -448,7 +453,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         log_rotate: Some(crate::cli::LogRotation::Daily),
                         ..Default::default()
@@ -462,7 +467,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         log_retain: Some(5),
                         ..Default::default()
@@ -476,7 +481,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         pass_start_args: true,
                         ..Default::default()
@@ -490,7 +495,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         env: vec![(s("FOO"), s("bar"))],
                         ..Default::default()
@@ -504,7 +509,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         env: vec![(s("FOO"), s("bar baz"))],
                         ..Default::default()
@@ -518,7 +523,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         env: vec![(s("FOO"), s("1")), (s("BAR"), s("2"))],
                         ..Default::default()
@@ -532,7 +537,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         path: vec![s("C:/foo")],
                         ..Default::default()
@@ -546,7 +551,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         path: vec![s("C:/foo bar")],
                         ..Default::default()
@@ -560,7 +565,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         path: vec![s("C:/foo"), s("C:/bar")],
                         ..Default::default()
@@ -574,7 +579,7 @@ speculate::speculate! {
             assert_eq!(
                 construct_shawl_run_args(
                     &s("shawl"),
-                    &None,
+                    &get_current_directory().unwrap(),
                     &CommonOpts {
                         priority: Some(crate::cli::Priority::AboveNormal),
                         ..Default::default()

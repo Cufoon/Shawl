@@ -1,25 +1,25 @@
 [package]
-name = "shawl"
-version = "1.7.0"
-authors = ["mtkennerly <mtkennerly@gmail.com>"]
+name = "shawl-cf"
+version = "1.7.1"
+authors = ["Cufoon <cufoon@gmail.com>", "mtkennerly <mtkennerly@gmail.com>"]
 edition = "2021"
 description = "Windows service wrapper for arbitrary commands"
-repository = "https://github.com/mtkennerly/shawl"
+repository = "https://github.com/Cufoon/Shawl"
 readme = "README.md"
 license = "MIT"
-default-run = "shawl"
+default-run = "shawl-cf"
 
 [dependencies]
-clap = { version = "4.5.20", features = ["derive", "wrap_help"] }
+clap = { version = "4.5.30", features = ["derive", "wrap_help"] }
 ctrlc = "3.4.5"
 dunce = "1.0.5"
-flexi_logger = "0.29.3"
-log = "0.4.22"
-windows = { version = "0.58.0", features = ["Win32_System_Console", "Win32_System_Threading"] }
-windows-service = "0.7.0"
+flexi_logger = "0.29.8"
+log = "0.4.26"
+windows = { version = "0.60.0", features = ["Win32_System_Console", "Win32_System_Threading"] }
+windows-service = "0.8.0"
 
 [dev-dependencies]
-regex = "1.11.0"
+regex = "1.11.1"
 speculate = "0.1.2"
 
 [build-dependencies]
